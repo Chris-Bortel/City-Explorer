@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 "use strict";
 
-// dotenv, expres, cors
+// dotenv, express, cors
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -10,8 +10,7 @@ const cors = require("cors");
 // anything from .env file wih show up here
 const PORT = process.env.PORT;
 
-//get an 'inastance of express as out app
-//app turns the server on
+//app turns the server on with an istance of express
 const app = express();
 
 app.use(cors()); //lets express function use other stuff...Dont worry about what it does
@@ -26,12 +25,12 @@ app.get("/location", (request, response) => {
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
   //this is a catch all, will make it so your server does not break
-  response.status(404).send(" what are you trying to do?");
+  response.status(404).send(" 404 error: what are you trying to do?");
 });
 
 //500 is bad news... app.use with a for parameter thing is an error handler
 app.use((error, request, response, next) => {
-  response.status(500).send(" server is broken");
+  response.status(500).send(" 500 error: server is broken");
 });
 
 app.listen(PORT, () => console.log("Server running on port", PORT));
