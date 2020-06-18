@@ -14,6 +14,13 @@ const PORT = process.env.PORT;
 const app = express();
 
 app.use(cors()); //lets express function use other stuff...Dont worry about what it does
+
+//Route on the "/" in the url bar of the browser
+//request and response are the parameters. Response: has methods that send data
+app.get("/", (request, response) => {
+  response.send("OK, you got it");
+});
+
 app.listen(PORT, () => console.log("Server running on port", PORT));
 
 //handle a request for location data
