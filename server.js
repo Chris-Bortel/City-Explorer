@@ -33,7 +33,7 @@ app.use((error, request, response, next) => {
   response.status(500).send(" 500 error: server is broken");
 });
 
-app.listen(PORT, () => console.log(`App is listening on ${Port}`));
+app.listen(PORT, () => console.log("Server running on port", PORT));
 
 //handle a request for location data
 //get a city from the client
