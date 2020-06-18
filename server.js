@@ -8,7 +8,7 @@ const cors = require("cors");
 
 // this is the magic that john was talking about
 // anything from .env file wih show up here
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 //app turns the server on with an istance of express
 const app = express();
@@ -33,7 +33,7 @@ app.use((error, request, response, next) => {
   response.status(500).send(" 500 error: server is broken");
 });
 
-app.listen(PORT, () => console.log("Server running on port", PORT));
+app.listen(PORT, () => console.log(`App is listening on ${Port}`));
 
 //handle a request for location data
 //get a city from the client
