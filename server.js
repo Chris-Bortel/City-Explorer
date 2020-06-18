@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 "use strict";
 
 // dotenv, expres, cors
@@ -19,6 +20,11 @@ app.use(cors()); //lets express function use other stuff...Dont worry about what
 //request and response are the parameters. Response: has methods that send data
 app.get("/", (request, response) => {
   response.send("OK, you got it");
+});
+
+app.get("/person", (request, response) => {
+  let person = { name: "chris", cool: true };
+  response.json(person);
 });
 
 app.listen(PORT, () => console.log("Server running on port", PORT));
