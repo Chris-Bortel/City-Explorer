@@ -5,9 +5,16 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-// console.log('hello');
 // this is the magic that john was talking about
-console.log(process.env.PORT);
+// anything from .env file wih show up here
+const PORT = process.env.PORT;
+
+//get an 'inastance of express as out app
+//app turns the server on
+const app = express();
+
+app.use(cors()); //lets express function use other stuff...Dont worry about what it does
+app.listen(PORT, () => console.log("Server running on port", PORT));
 
 //handle a request for location data
 //get a city from the client
