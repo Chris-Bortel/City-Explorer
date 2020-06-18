@@ -8,7 +8,7 @@ const cors = require("cors");
 
 // this is the magic that john was talking about
 // anything from .env file wih show up here
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 //app turns the server on with an istance of express
 const app = express();
