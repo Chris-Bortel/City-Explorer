@@ -19,17 +19,10 @@ app.use(cors()); //lets express function use other stuff...Dont worry about what
 //Route on the "/" in the url bar of the browser
 //request and response are the parameters. Response: has methods that send data
 app.get("/location", (request, response) => {
-  response.send("OK, you got it");
+  let data = require("./data/location.json");
+  response.status(200).json(data);
 });
 
-app.get("/person", (request, response) => {
-  let person = { name: "chris", cool: true };
-  response.json(person);
-});
-
-app.get("/bad", (request, response) => {
-  throw new Error("What is going on!");
-});
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
   //this is a catch all, will make it so your server does not break
