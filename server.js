@@ -6,45 +6,48 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-// this is the magic that john was talking about
-// anything from .env file wih show up here
+// this references the .env file and spits out the port that we have declared
 const PORT = process.env.PORT;
 
-//app turns the server on with an istance of express
+//declares a variable that turns the express server on
 const app = express();
 
-app.use(cors()); //lets express function use other stuff...Dont worry about what it does
+//tells server to use the cors library
+app.use(cors());
 
-//Route on the "/" in the url bar of the browser
+// a callback function that is run when we run a route
 //request and response are the parameters. Response: has methods that send data
+//this route is giving back the location json file
 app.get("/location", (request, response) => {
   let data = require("./data/location.json");
-  response.status(200).json(data);
+  console.log(request);
+  // we need to change the array of one to what the contract expects. this is the json at index of 0
+  let locationObj = new Location(data[0]);
+  //the response sends the data that the client wants
+  response.status(200).json(locationObj);
 });
+
+//constructor function that manipulates the data to give the client an obj that it can work with
+function Location(obj) {
+  this.latitude = obj.lat;
+  this.longitude = obj.lon;
+  this.formatted_query = obj.display_name;
+}
+
+// weather
+//build constructor function for the weather json
 
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
-  //this is a catch all, will make it so your server does not break
-  response.status(404).send(" 404 error: what are you trying to do?");
+  // custom message that tells users that eh route does not exist
+  response.status(404).send(" 404 error: provide a valid route");
 });
 
-//500 is bad news... app.use with a for parameter thing is an error handler
+// error handler
 app.use((error, request, response, next) => {
-  response.status(500).send(" 500 error: server is broken");
+  response.status(500).send(" 500 error: your server is broken");
 });
 
+//This is the server, it listens to what the client wants to do. Runs the routes.
+//turns the server on. and sets up a callback funtion that says that we are running. This lets us access data.
 app.listen(PORT, () => console.log("Server running on port", PORT));
-
-//handle a request for location data
-//get a city from the client
-//ffetch data from an API
-//adapt the data, usign a Constructor function
-//send the adapted data to the client
-
-// locatopn constructor function
-// tanke is som big object, turn it into something that matches the contract
-
-//handle a request for retaurant data
-// get location info from the client (lat, logn, city-name)
-//fetch data from an api
-//adapt the data, using a contructor function
