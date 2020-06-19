@@ -45,14 +45,14 @@ app.get("/weather", (request, response) => {
   weatherData.data.forEach((weatherObj) => {
     //targeting the specific collection of data that I wanted
     let weather = new Weather(weatherObj);
-    console.log(allWeather);
+    // console.log(allWeather);
     allWeather.push(weather); //created instance of weather 'class', put into the weather array, they are all in one place
   });
   response.status(200).json(allWeather); // entire collection of objects gets turned into json and sent as a valid json object to the client
 });
 
 function Weather(obj) {
-  this.forcast = obj.weather.description;
+  this.forecast = obj.weather.description;
   this.time = obj.datetime;
 }
 
