@@ -23,6 +23,7 @@ app.get("/location", (request, response) => {
   console.log(request);
   // we need to change the array of one to what the contract expects. this is the json at index of 0
   let locationObj = new Location(data[0]);
+  locationObj.search_query = request.query.city;
   //the response sends the data that the client wants
   response.status(200).json(locationObj);
 });
