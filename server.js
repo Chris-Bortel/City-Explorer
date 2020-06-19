@@ -39,17 +39,16 @@ function Location(obj, city) {
 //build constructor function for the weather json
 //need a git route
 app.get("/weather", (request, response) => {
-  let weatherData = require("./data/weather.json");
-  // console.log(data);
+  let weatherData = require("./data/weather.json"); //one big json object
 
   let allWeather = [];
   weatherData.data.forEach((weatherObj) => {
-    // weatherData.data gets me to the array that I am wanting to work with
+    //targeting the specific collection of data that I wanted
     let weather = new Weather(weatherObj);
     console.log(allWeather);
-    allWeather.push(weather);
+    allWeather.push(weather); //created instance of weather 'class', put into the weather array, they are all in one place
   });
-  response.status(200).json(allWeather);
+  response.status(200).json(allWeather); // entire collection of objects gets turned into json and sent as a valid json object to the client
 });
 
 function Weather(obj) {
