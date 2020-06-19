@@ -22,7 +22,7 @@ app.get("/location", (request, response) => {
   let data = require("./data/location.json");
   // we need to change the array of one to what the contract expects. this is the json at index of 0
   let locationObj = new Location(data[0], request.query.city); //query is an object
-  console.log(request);
+  // console.log(request);
   //the response sends the data that the client wants
   response.status(200).json(locationObj);
 });
@@ -37,6 +37,24 @@ function Location(obj, city) {
 
 // weather
 //build constructor function for the weather json
+//need a git route
+app.get("/weather", (request, response) => {
+  let weatherData = require("./data/weather.json"); //one big json object
+
+  let allWeather = [];
+  weatherData.data.forEach((weatherObj) => {
+    //targeting the specific collection of data that I wanted
+    let weather = new Weather(weatherObj);
+    // console.log(allWeather);
+    allWeather.push(weather); //created instance of weather 'class', put into the weather array, they are all in one place
+  });
+  response.status(200).json(allWeather); // entire collection of objects gets turned into json and sent as a valid json object to the client
+});
+
+function Weather(obj) {
+  this.forecast = obj.weather.description;
+  this.time = obj.datetime;
+}
 
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
