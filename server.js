@@ -20,19 +20,19 @@ app.use(cors());
 //this route is giving back the location json file
 app.get("/location", (request, response) => {
   let data = require("./data/location.json");
-  console.log(request);
   // we need to change the array of one to what the contract expects. this is the json at index of 0
-  let locationObj = new Location(data[0]);
-  locationObj.search_query = request.query.city;
+  let locationObj = new Location(data[0], request.query.city); //query is an object
+  console.log(request);
   //the response sends the data that the client wants
   response.status(200).json(locationObj);
 });
 
 //constructor function that manipulates the data to give the client an obj that it can work with
-function Location(obj) {
+function Location(obj, city) {
   this.latitude = obj.lat;
   this.longitude = obj.lon;
   this.formatted_query = obj.display_name;
+  this.search_query = city;
 }
 
 // weather
