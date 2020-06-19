@@ -37,6 +37,12 @@ function Location(obj, city) {
 
 // weather
 //build constructor function for the weather json
+//need a git route
+app.get("/weather", (request, response) => {
+  let data = require("./data/weather.json");
+  console.log(data);
+  response.status(200).json(data);
+});
 
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
