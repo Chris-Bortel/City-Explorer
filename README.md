@@ -25,23 +25,32 @@ Node, Npm, and Express
 
 06-18-2020 4:15 - Application has a fully-functional express server, with a GET route for the location resource. It is grabbing the data from the location.json file. Response request cycle.
 
+06-18-2020 9:30PM - Application is recieving requests from client and responding with properly formatted json objects of the location data that is expected, the search query is also functional. John and Ray walked me through the search query magic.
+
+06-19-202 9:30PM - Application is recieving requests from client and responding with properly formatted json objects of the weather data that is expected. --- Skyler helped me spot some bug in my weather route.
+
 ## Credits and Collaborations
 
 John Cokos: Followed his code demo to build the basic express server.
 
-<!-- Give credit (and a link) to other people or resources that helped you build this application.
-
-
-
-
+Give credit (and a link) to other people or resources that helped you build this application.
 
 ## User Acceptance Tests
-Number and name of feature: _06 basic-server-setup
 
-Estimate of time needed to complete: 2.5 hours
+- Number and name of feature: lab-06 Feature #1 - Repository Set Up
+- Estimate of time needed to complete: 2.5 hours
+- Start time: 12:00 PM
+- Finish time: 3:30 PM
+- Actual time needed to complete: 3.5 hours
 
-Start time: 12:00 PM
+* Number and name of feature: lab-06 Feature #2 - Locations
+* Estimate of time needed to complete: 2 hours
+* Start time: 6:30 PM
+* Finish time: 9:30 PM
+* Actual time needed to complete: 3 hours
 
-Finish time: 3:30 PM
-
-Actual time needed to complete: 3.5 hours
+- Number and name of feature: lab-06 Feature #3 - Weather
+- Estimate of time needed to complete: 2 hours
+- Start time: 12:00 PM
+- Finish time: 3:00 PM
+- Actual time needed to complete: 3 hours
