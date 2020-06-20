@@ -29,6 +29,8 @@ Node, Npm, and Express
 
 06-19-202 9:30PM - Application is recieving requests from client and responding with properly formatted json objects of the weather data that is expected. --- Skyler helped me spot some bug in my weather route.
 
+06-20-2020 2:00PM - Application is setup with the location API and allowing user to search by the name of the city.
+
 ## Credits and Collaborations
 
 John Cokos: Followed his code demo to build the basic express server.
@@ -54,3 +56,9 @@ Give credit (and a link) to other people or resources that helped you build this
 - Start time: 12:00 PM
 - Finish time: 3:00 PM
 - Actual time needed to complete: 3 hours
+
+- Number and name of feature: lab-01 Feature #1 and #2 - Weather
+- Estimate of time needed to complete: 2 hours
+- Start time: 12:30 PM
+- Finish time: 2:00 PM
+- Actual time needed to complete: 1.5 hours
