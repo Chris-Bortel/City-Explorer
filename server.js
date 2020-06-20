@@ -23,7 +23,7 @@ app.use(cors());
 //this route is giving back the location json file
 
 app.get("/", (request, response) => {
-  response.send("hello");
+  response.send("port is running");
 });
 app.get("/location", (request, response) => {
   const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE}&q=${request.query.city}&format=json`;
@@ -56,14 +56,14 @@ function Location(obj, city) {
 app.get("/weather", (request, response) => {
   let weatherData = require("./data/weather.json"); //one big json object
 
-  let allWeather = [];
-  weatherData.data.forEach((weatherObj) => {
+  // let allWeather = [];
+  const results = weatherData.data.map((result) => {
+    // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
     //targeting the specific collection of data that I wanted
-    let weather = new Weather(weatherObj);
+    return new Weather(result);
     // console.log(allWeather);
-    allWeather.push(weather); //created instance of weather 'class', put into the weather array, they are all in one place
   });
-  response.status(200).json(allWeather); // entire collection of objects gets turned into json and sent as a valid json object to the client
+  response.status(200).json(results); // results contains inside of it, we have all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
 });
 
 function Weather(obj) {
