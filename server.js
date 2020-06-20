@@ -23,10 +23,10 @@ app.use(cors());
 //this route is giving back the location json file
 
 app.get("/", (request, response) => {
-  response.send("port is running");
+  response.send(`PORT ${PORT} is running`);
 });
 app.get("/location", (request, response) => {
-  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE}&q=${request.query.city}&format=json`;
+  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
 
   superagent
     .get(API)
