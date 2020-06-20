@@ -28,14 +28,18 @@ app.get("/", (request, response) => {
 app.get("/location", (request, response) => {
   const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE}&q=${request.query.city}&format=json`;
 
-  superagent.get(API).then((data) => {
-    let locationObj = new Location(data.body[0], request.query.city); //query is an object
-    // console.log(request);
-    //the response sends the data that the client wants
-    response.status(200).send(locationObj);
-
-    // process.env
-  });
+  superagent
+    .get(API)
+    .then((data) => {
+      let locationObj = new Location(data.body[0], request.query.city); //query is an object
+      // console.log(request);
+      //the response sends the data that the client wants
+      response.status(200).send(locationObj);
+    })
+    .catch(() => {
+      response.status(500).send(console.log("this is not working "));
+    });
+  // process.env
 });
 
 //constructor function that manipulates the data to give the client an obj that it can work with
