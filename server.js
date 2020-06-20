@@ -5,11 +5,14 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const superagent = require("superagent");
+const { response } = require("express");
 
 // this references the .env file and spits out the port that we have declared
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
-//declares a variable that turns the express server on
+//Starts up express server
+//inokes the instance of express
 const app = express();
 
 //tells server to use the cors library
@@ -18,13 +21,21 @@ app.use(cors());
 // a callback function that is run when we run a route
 //request and response are the parameters. Response: has methods that send data
 //this route is giving back the location json file
+
+app.get("/", (request, response) => {
+  response.send("hello");
+});
 app.get("/location", (request, response) => {
-  let data = require("./data/location.json");
-  // we need to change the array of one to what the contract expects. this is the json at index of 0
-  let locationObj = new Location(data[0], request.query.city); //query is an object
-  // console.log(request);
-  //the response sends the data that the client wants
-  response.status(200).json(locationObj);
+  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE}&q=${request.query.city}&format=json`;
+
+  superagent.get(API).then((data) => {
+    let locationObj = new Location(data.body[0], request.query.city); //query is an object
+    // console.log(request);
+    //the response sends the data that the client wants
+    response.status(200).send(locationObj);
+
+    // process.env
+  });
 });
 
 //constructor function that manipulates the data to give the client an obj that it can work with
@@ -69,4 +80,4 @@ app.use((error, request, response, next) => {
 
 //This is the server, it listens to what the client wants to do. Runs the routes.
 //turns the server on. and sets up a callback funtion that says that we are running. This lets us access data.
-app.listen(PORT, () => console.log("Server running on port", PORT));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
