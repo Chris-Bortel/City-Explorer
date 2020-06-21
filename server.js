@@ -6,43 +6,39 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const superagent = require("superagent");
-const { response } = require("express");
+const { response, request } = require("express");
 
-// this references the .env file and spits out the port that we have declared
+// this references the .env file and spits out the port
 const PORT = process.env.PORT || 3000;
 
 //Starts up express server
-//inokes the instance of express
 const app = express();
 
 //tells server to use the cors library
 app.use(cors());
 
-// a callback function that is run when we run a route
-//request and response are the parameters. Response: has methods that send data
-//this route is giving back the location json file
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
+// a callback function that is run when we run a route
+//request and response are the parameters.
 app.get("/", (request, response) => {
-  response.send("port is running");
+  response.send(`PORT ${PORT} is running`);
 });
+
 app.get("/location", (request, response) => {
-  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE}&q=${request.query.city}&format=json`;
+  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
 
   superagent
     .get(API)
     .then((data) => {
-      let locationObj = new Location(data.body[0], request.query.city); //query is an object
-      // console.log(request);
-      //the response sends the data that the client wants
+      let locationObj = new Location(data.body[0], request.query.city);
       response.status(200).send(locationObj);
     })
     .catch(() => {
       response.status(500).send(console.log("this is not working "));
     });
-  // process.env
 });
 
-//constructor function that manipulates the data to give the client an obj that it can work with
 function Location(obj, city) {
   this.latitude = obj.lat;
   this.longitude = obj.lon;
@@ -50,20 +46,44 @@ function Location(obj, city) {
   this.search_query = city;
 }
 
-// weather
-//build constructor function for the weather json
-//need a git route
+app.get("/weather", (request, response) => {
+  console.log("request delivered", request.query);
+  // const coordinates = {
+  //   lat: request.query.latitude,
+  //   lon: request.query.longitude,
+  // };
+
+  // const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${coordinates.lat}&long=${coordinates.lon}&days=8&key=${process.env.WEATHER_API_KEY}`;
+
+  const API = `https://api.weatherbit.io/v2.0/forecast/daily?city=Raleigh,NC&key=${process.env.WEATHER_API_KEY}`;
+  superagent //returned promise
+    .get(API)
+    // .set("api-key", process.env.WEATHER_API_KEY)
+    .then((dataResults) => {
+      console.log("please give me results", dataResults);
+      let results = dataResults.body.data.map((result) => {
+        //TODO: data is 'undefined'
+        // console.log(
+        //   "weather results are here +++++++++++++++++====++++++++++++++++++",
+        //   // weatherResult.weather.description
+        // );
+        return new Weather(result);
+      });
+      response.status(200).json(results); //this is the actual promise
+    })
+    .catch((err) => {
+      console.error("Weather api is not working", err);
+    });
+});
+
 app.get("/weather", (request, response) => {
   let weatherData = require("./data/weather.json"); //one big json object
 
-  // let allWeather = [];
   const results = weatherData.data.map((result) => {
     // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
-    //targeting the specific collection of data that I wanted
     return new Weather(result);
-    // console.log(allWeather);
   });
-  response.status(200).json(results); // results contains inside of it, we have all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
+  response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
 });
 
 function Weather(obj) {
@@ -81,7 +101,3 @@ app.use("*", (request, response) => {
 app.use((error, request, response, next) => {
   response.status(500).send(" 500 error: your server is broken");
 });
-
-//This is the server, it listens to what the client wants to do. Runs the routes.
-//turns the server on. and sets up a callback funtion that says that we are running. This lets us access data.
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
