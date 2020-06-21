@@ -6,7 +6,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const superagent = require("superagent");
-const { response } = require("express");
+const { response, request } = require("express");
 
 // this references the .env file and spits out the port
 const PORT = process.env.PORT || 3000;
@@ -31,9 +31,7 @@ app.get("/location", (request, response) => {
   superagent
     .get(API)
     .then((data) => {
-      let locationObj = new Location(data.body[0], request.query.city); //query is an object
-      // console.log(request);
-      //the response sends the data that the client wants
+      let locationObj = new Location(data.body[0], request.query.city);
       response.status(200).send(locationObj);
     })
     .catch(() => {
@@ -49,14 +47,44 @@ function Location(obj, city) {
 }
 
 app.get("/weather", (request, response) => {
-  let weatherData = require("./data/weather.json"); //one big json object
+  console.log("request delivered", request.query);
+  // const coordinates = {
+  //   lat: request.query.latitude,
+  //   lon: request.query.longitude,
+  // };
 
-  const results = weatherData.data.map((result) => {
-    // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
-    return new Weather(result);
-  });
-  response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
+  // const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${coordinates.lat}&long=${coordinates.lon}&days=8&key=${process.env.WEATHER_API_KEY}`;
+
+  const API = `https://api.weatherbit.io/v2.0/forecast/daily?city=Raleigh,NC&key=${process.env.WEATHER_API_KEY}`;
+  superagent //returned promise
+    .get(API)
+    // .set("api-key", process.env.WEATHER_API_KEY)
+    .then((dataResults) => {
+      console.log("please give me results", dataResults);
+      let weatherResults = dataResults.body.data.map((weatherResult) => {
+        //TODO: data is 'undefined'
+        console.log(
+          "weather results are here +++++++++++++++++====++++++++++++++++++",
+          weatherResult.weather.description
+        );
+        return new Weather(weatherResult);
+      });
+      response.status(200).json(weatherResults); //this is the actual promise
+    })
+    .catch((err) => {
+      console.error("Weather api is not working", err);
+    });
 });
+
+// app.get("/weather", (request, response) => {
+//   let weatherData = require("./data/weather.json"); //one big json object
+
+//   const results = weatherData.data.map((result) => {
+//     // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
+//     return new Weather(result);
+//   });
+//   response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
+// });
 
 function Weather(obj) {
   this.forecast = obj.weather.description;
