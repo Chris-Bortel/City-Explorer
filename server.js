@@ -61,30 +61,30 @@ app.get("/weather", (request, response) => {
     // .set("api-key", process.env.WEATHER_API_KEY)
     .then((dataResults) => {
       console.log("please give me results", dataResults);
-      let weatherResults = dataResults.body.data.map((weatherResult) => {
+      let results = dataResults.body.data.map((result) => {
         //TODO: data is 'undefined'
-        console.log(
-          "weather results are here +++++++++++++++++====++++++++++++++++++",
-          weatherResult.weather.description
-        );
-        return new Weather(weatherResult);
+        // console.log(
+        //   "weather results are here +++++++++++++++++====++++++++++++++++++",
+        //   // weatherResult.weather.description
+        // );
+        return new Weather(result);
       });
-      response.status(200).json(weatherResults); //this is the actual promise
+      response.status(200).json(results); //this is the actual promise
     })
     .catch((err) => {
       console.error("Weather api is not working", err);
     });
 });
 
-// app.get("/weather", (request, response) => {
-//   let weatherData = require("./data/weather.json"); //one big json object
+app.get("/weather", (request, response) => {
+  let weatherData = require("./data/weather.json"); //one big json object
 
-//   const results = weatherData.data.map((result) => {
-//     // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
-//     return new Weather(result);
-//   });
-//   response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
-// });
+  const results = weatherData.data.map((result) => {
+    // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
+    return new Weather(result);
+  });
+  response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
+});
 
 function Weather(obj) {
   this.forecast = obj.weather.description;
