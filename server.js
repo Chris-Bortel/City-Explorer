@@ -76,21 +76,27 @@ app.get("/weather", (request, response) => {
     });
 });
 
-app.get("/weather", (request, response) => {
-  let weatherData = require("./data/weather.json"); //one big json object
+// app.get("/weather", (request, response) => {
+//   let weatherData = require("./data/weather.json"); //one big json object
 
-  const results = weatherData.data.map((result) => {
-    // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
-    return new Weather(result);
-  });
-  response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
-});
+//   const results = weatherData.data.map((result) => {
+//     // each index of the weather data we take it, pass it, and instantiate a new instance of the Weather obj
+//     return new Weather(result);
+//   });
+//   response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
+// });
 
 function Weather(obj) {
   this.forecast = obj.weather.description;
   this.time = obj.datetime;
 }
 
+app.get("/trails", (request, response) => {
+  // console.log("Trail request delivered", request.query);
+  const API = `https://www.hikingproject.com/data/get-trails?key=200809744-65dfad75539efea1ea6436a215fe5a30&lat=40.0274&lon=-105.2519&maxDistance=10`;
+
+  superagent.get(API).then((data) => {});
+});
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
   // custom message that tells users that eh route does not exist
