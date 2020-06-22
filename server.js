@@ -95,7 +95,10 @@ app.get("/trails", (request, response) => {
   // console.log("Trail request delivered", request.query);
   const API = `https://www.hikingproject.com/data/get-trails?key=200809744-65dfad75539efea1ea6436a215fe5a30&lat=40.0274&lon=-105.2519&maxDistance=10`;
 
-  superagent.get(API).then((data) => {});
+  superagent.get(API).then((data) => {
+    console.log("data please", data.body);
+  });
+  // response.status.json(results);
 });
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
