@@ -62,7 +62,7 @@ app.get("/weather", (request, response) => {
 });
 
 app.get("/trails", (request, response) => {
-  console.log("Trail request delivered", request.query);
+  // console.log("Trail request delivered", request.query);
   const API = `https://www.hikingproject.com/data/get-trails?key=${process.env.TRAIL_API_KEY}&lat=40.0274&lon=-105.2519&maxDistance=10`;
 
   superagent
@@ -74,6 +74,7 @@ app.get("/trails", (request, response) => {
         return new Trails(result);
       });
       response.status(200).json(results);
+      console.log(results);
     })
     .catch((err) => {
       console.error("Trail api is not working", err);
@@ -93,7 +94,7 @@ function Weather(obj) {
 }
 
 function Trails(obj) {
-  this.name = obj.trails;
+  this.name = obj.location;
 }
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
