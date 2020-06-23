@@ -38,14 +38,14 @@ app.get("/location", (request, response) => {
 
 app.get("/weather", (request, response) => {
   console.log("request delivered", request.query);
-  // const coordinates = {
-  //   lat: request.query.latitude,
-  //   lon: request.query.longitude,
-  // };
+  const coordinates = {
+    lat: request.query.latitude,
+    lon: request.query.longitude,
+  };
 
   // const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${coordinates.lat}&long=${coordinates.lon}&days=8&key=${process.env.WEATHER_API_KEY}`;
 
-  const API = `https://api.weatherbit.io/v2.0/forecast/daily?city=Raleigh,NC&key=${process.env.WEATHER_API_KEY}`;
+  const API = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&days=8`;
   superagent //returned promise
     .get(API)
     // .set("api-key", process.env.WEATHER_API_KEY)
@@ -62,8 +62,13 @@ app.get("/weather", (request, response) => {
 });
 
 app.get("/trails", (request, response) => {
+  const coordinates = {
+    lat: request.query.latitude,
+    lon: request.query.longitude,
+  };
+  console.log(coordinates);
   // console.log("Trail request delivered", request.query);
-  const API = `https://www.hikingproject.com/data/get-trails?key=${process.env.TRAIL_API_KEY}&lat=40.0274&lon=-105.2519&maxDistance=10`;
+  const API = `https://www.hikingproject.com/data/get-trails?key=${process.env.TRAIL_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&maxDistance=10`;
 
   superagent
     .get(API)
@@ -102,7 +107,7 @@ function Trails(obj) {
   this.summary = obj.summary;
   this.trail_url = obj.url;
   this.conditions = obj.conditionDetails;
-  this.condition_date = obj.conditionDate;
+  this.condition_date = obj.conditionDate; // I need to take this item, filter it, and then return either side to its respected variable
   this.condition_time = obj.conditionDate;
 }
 //app.put(), app.delete(), app.post()
