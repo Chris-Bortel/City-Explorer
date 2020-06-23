@@ -10,17 +10,14 @@ const { response, request } = require("express");
 
 // this references the .env file and spits out the port
 const PORT = process.env.PORT || 3000;
-
 //Starts up express server
 const app = express();
-
 //tells server to use the cors library
 app.use(cors());
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// a callback function that is run when we run a route
-//request and response are the parameters.
+//Callback function
 app.get("/", (request, response) => {
   response.send(`PORT ${PORT} is running`);
 });
@@ -38,13 +35,6 @@ app.get("/location", (request, response) => {
       response.status(500).send(console.log("this is not working "));
     });
 });
-
-function Location(obj, city) {
-  this.latitude = obj.lat;
-  this.longitude = obj.lon;
-  this.formatted_query = obj.display_name;
-  this.search_query = city;
-}
 
 app.get("/weather", (request, response) => {
   console.log("request delivered", request.query);
@@ -85,6 +75,13 @@ app.get("/weather", (request, response) => {
 //   });
 //   response.status(200).json(results); // results has all of the weather data......entire collection of objects gets turned into json and sent as a valid json object to the client
 // });
+
+function Location(obj, city) {
+  this.latitude = obj.lat;
+  this.longitude = obj.lon;
+  this.formatted_query = obj.display_name;
+  this.search_query = city;
+}
 
 function Weather(obj) {
   this.forecast = obj.weather.description;
