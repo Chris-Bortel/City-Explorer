@@ -94,7 +94,16 @@ function Weather(obj) {
 }
 
 function Trails(obj) {
-  this.name = obj.location;
+  this.name = obj.name;
+  this.location = obj.location;
+  this.length = obj.length;
+  this.stars = obj.stars;
+  this.star_votes = obj.star_votes;
+  this.summary = obj.summary;
+  this.trail_url = obj.url;
+  this.conditions = obj.conditionDetails;
+  this.condition_date = obj.conditionDate;
+  this.condition_time = obj.conditionDate;
 }
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
