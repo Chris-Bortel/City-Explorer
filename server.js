@@ -95,7 +95,7 @@ function Location(obj, city) {
 
 function Weather(obj) {
   this.forecast = obj.weather.description;
-  this.time = obj.datetime;
+  this.time = new Date(obj.datetime).toDateString();
 }
 
 function Trails(obj) {
