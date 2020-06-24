@@ -6,38 +6,87 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const superagent = require("superagent");
-const { response, request } = require("express");
 
 // this references the .env file and spits out the port
 const PORT = process.env.PORT || 3000;
-//Starts up express server
+
+// Initializes an express server
 const app = express();
-//tells server to use the cors library
+
+// tells server to use the cors library the () = everyone
 app.use(cors());
 
+// declare routes
+app.get('/', handleHomePage);
+app.get('/location', handleLocation);
+app.get('/weather', handleWeather);
+app.get('/trails', handleTrails);
+
+// Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-//Callback function
-app.get("/", (request, response) => {
-  response.send(`PORT ${PORT} is running`);
-});
+// Route Handlers
 
-app.get("/location", (request, response) => {
-  const API = `https://us1.locationiq.com/v1/search.php?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
+function handleHomePage(request, response) {
+  response.send(`PORT ${PORT} is running`);
+}
+
+// In Memory Cache
+let locations = {};
+
+function handleLocation(request, response) {
+
+  // request.query.city is what the user typed in...
+  // If the database has it ...
+  if (locations[request.query.city]) {
+    console.log('we have it already...')
+    response.status(200).send(locations[request.query.city]);
+  }
+  else {
+    console.log('going to get it');
+    fetchLocationDataFromAPI(request.query.city, response);
+  }
+
+}
+
+function fetchLocationDataFromAPI(city, response) {
+
+  const API = 'https://us1.locationiq.com/v1/search.php';
+  // Query String
+  // ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
+
+  let queryObject = {
+    key: process.env.GEOCODE_API_KEY,
+    q: city,
+    format: 'json'
+  }
 
   superagent
     .get(API)
+    .query(queryObject)
     .then((data) => {
-      let locationObj = new Location(data.body[0], request.query.city);
+      let locationObj = new Location(data.body[0], city);
+
+      // save the city for later
+      locations[city] = locationObj;
+
+      // send the city to the user
       response.status(200).send(locationObj);
     })
     .catch(() => {
       response.status(500).send(console.log("this is not working "));
     });
-});
+}
 
-app.get("/weather", (request, response) => {
-  console.log("request delivered", request.query);
+function Location(obj, city) {
+  this.latitude = obj.lat;
+  this.longitude = obj.lon;
+  this.formatted_query = obj.display_name;
+  this.search_query = city;
+}
+
+// Volatile Data -- because it changes frequently, we don't cache it.
+function handleWeather(request, response) {
   const coordinates = {
     lat: request.query.latitude,
     lon: request.query.longitude,
@@ -50,7 +99,6 @@ app.get("/weather", (request, response) => {
     .get(API)
     // .set("api-key", process.env.WEATHER_API_KEY)
     .then((dataResults) => {
-      console.log("please give me results", dataResults);
       let results = dataResults.body.data.map((result) => {
         return new Weather(result);
       });
@@ -59,43 +107,33 @@ app.get("/weather", (request, response) => {
     .catch((err) => {
       console.error("Weather api is not working", err);
     });
-});
-
-app.get("/trails", (request, response) => {
-  const coordinates = {
-    lat: request.query.latitude,
-    lon: request.query.longitude,
-  };
-  console.log(coordinates);
-  // console.log("Trail request delivered", request.query);
-  const API = `https://www.hikingproject.com/data/get-trails?key=${process.env.TRAIL_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&maxDistance=10`;
-
-  superagent
-    .get(API)
-    .then((dataResults) => {
-      console.log("trail data please", dataResults.body);
-      let results = dataResults.body.trails.map((result) => {
-        // console.log(results);
-        return new Trails(result);
-      });
-      response.status(200).json(results);
-      console.log(results);
-    })
-    .catch((err) => {
-      console.error("Trail api is not working", err);
-    });
-});
-
-function Location(obj, city) {
-  this.latitude = obj.lat;
-  this.longitude = obj.lon;
-  this.formatted_query = obj.display_name;
-  this.search_query = city;
 }
 
 function Weather(obj) {
   this.forecast = obj.weather.description;
   this.time = new Date(obj.datetime).toDateString();
+}
+
+
+// Volatile Data -- because it changes frequently, we don't cache it.
+function handleTrails(request, response) {
+  const coordinates = {
+    lat: request.query.latitude,
+    lon: request.query.longitude,
+  };
+  const API = `https://www.hikingproject.com/data/get-trails?key=${process.env.TRAIL_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&maxDistance=10`;
+
+  superagent
+    .get(API)
+    .then((dataResults) => {
+      let results = dataResults.body.trails.map((result) => {
+        return new Trails(result);
+      });
+      response.status(200).json(results);
+    })
+    .catch((err) => {
+      console.error("Trail api is not working", err);
+    });
 }
 
 function Trails(obj) {
@@ -110,6 +148,8 @@ function Trails(obj) {
   this.condition_date = obj.conditionDate; // I need to take this item, filter it, and then return either side to its respected variable
   this.condition_time = obj.conditionDate;
 }
+
+
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
   // custom message that tells users that eh route does not exist
