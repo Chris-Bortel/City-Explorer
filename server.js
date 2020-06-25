@@ -88,17 +88,8 @@ function handleWeather(request, response) {
     key: process.env.WEATHER_API_KEY,
     lat: request.query.latitude,
     lon: request.query.longitude,
+    // &days=8   ?????How do I do this one?
   };
-
-  // const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${coordinates.lat}&long=${coordinates.lon}&days=8&key=${process.env.WEATHER_API_KEY}`;
-
-  // ?key=${process.env.WEATHER_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&days=8`;
-
-  // let queryObject = {
-  //   key: process.env.WEATHER_API_KEY,
-  //   lat: request.query.latitude,
-  //   lon: request.query.longitude,
-  // };
 
   superagent //returned promise
     .get(API)
@@ -125,10 +116,17 @@ function handleTrails(request, response) {
     lat: request.query.latitude,
     lon: request.query.longitude,
   };
-  const API = `https://www.hikingproject.com/data/get-trails?key=${process.env.TRAIL_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&maxDistance=10`;
+  const API = `https://www.hikingproject.com/data/get-trails?&maxDistance=10`;
+
+  const queryObject = {
+    key: process.env.TRAIL_API_KEY,
+    lat: request.query.latitude,
+    lon: request.query.longitude,
+  };
 
   superagent
     .get(API)
+    .query(queryObject)
     .then((dataResults) => {
       let results = dataResults.body.trails.map((result) => {
         return new Trails(result);
