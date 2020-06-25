@@ -116,7 +116,7 @@ function handleTrails(request, response) {
     lat: request.query.latitude,
     lon: request.query.longitude,
   };
-  const API = `https://www.hikingproject.com/data/get-trails?&maxDistance=10`;
+  const API = `https://www.hikingproject.com/data/get-trails?&maxDistance=10`; //TODO: the distance is not working
 
   const queryObject = {
     key: process.env.TRAIL_API_KEY,
