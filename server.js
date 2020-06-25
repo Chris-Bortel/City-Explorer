@@ -13,14 +13,14 @@ const PORT = process.env.PORT || 3000;
 // Initializes an express server
 const app = express();
 
-// tells server to use the cors library the () = everyone
+// tells server to use the cors library the () = everyone //Cors limits who can access your server
 app.use(cors());
 
 // declare routes
-app.get('/', handleHomePage);
-app.get('/location', handleLocation);
-app.get('/weather', handleWeather);
-app.get('/trails', handleTrails);
+app.get("/", handleHomePage);
+app.get("/location", handleLocation);
+app.get("/weather", handleWeather);
+app.get("/trails", handleTrails);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
@@ -35,31 +35,27 @@ function handleHomePage(request, response) {
 let locations = {};
 
 function handleLocation(request, response) {
-
   // request.query.city is what the user typed in...
   // If the database has it ...
   if (locations[request.query.city]) {
-    console.log('we have it already...')
+    console.log("we have it already...");
     response.status(200).send(locations[request.query.city]);
-  }
-  else {
-    console.log('going to get it');
+  } else {
+    console.log("going to get it");
     fetchLocationDataFromAPI(request.query.city, response);
   }
-
 }
 
 function fetchLocationDataFromAPI(city, response) {
-
-  const API = 'https://us1.locationiq.com/v1/search.php';
+  const API = "https://us1.locationiq.com/v1/search.php";
   // Query String
   // ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
     q: city,
-    format: 'json'
-  }
+    format: "json",
+  };
 
   superagent
     .get(API)
@@ -87,17 +83,26 @@ function Location(obj, city) {
 
 // Volatile Data -- because it changes frequently, we don't cache it.
 function handleWeather(request, response) {
-  const coordinates = {
+  const API = `https://api.weatherbit.io/v2.0/forecast/daily`;
+  const queryObject = {
+    key: process.env.WEATHER_API_KEY,
     lat: request.query.latitude,
     lon: request.query.longitude,
   };
 
   // const API = `https://api.weatherbit.io/v2.0/forecast/daily?&lat=${coordinates.lat}&long=${coordinates.lon}&days=8&key=${process.env.WEATHER_API_KEY}`;
 
-  const API = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&days=8`;
+  // ?key=${process.env.WEATHER_API_KEY}&lat=${coordinates.lat}&lon=${coordinates.lon}&days=8`;
+
+  // let queryObject = {
+  //   key: process.env.WEATHER_API_KEY,
+  //   lat: request.query.latitude,
+  //   lon: request.query.longitude,
+  // };
+
   superagent //returned promise
     .get(API)
-    // .set("api-key", process.env.WEATHER_API_KEY)
+    .query(queryObject)
     .then((dataResults) => {
       let results = dataResults.body.data.map((result) => {
         return new Weather(result);
@@ -113,7 +118,6 @@ function Weather(obj) {
   this.forecast = obj.weather.description;
   this.time = new Date(obj.datetime).toDateString();
 }
-
 
 // Volatile Data -- because it changes frequently, we don't cache it.
 function handleTrails(request, response) {
@@ -148,7 +152,6 @@ function Trails(obj) {
   this.condition_date = obj.conditionDate; // I need to take this item, filter it, and then return either side to its respected variable
   this.condition_time = obj.conditionDate;
 }
-
 
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
