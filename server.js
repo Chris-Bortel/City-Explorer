@@ -14,14 +14,43 @@ const PORT = process.env.PORT || 3000;
 // Initializes an express server
 const app = express();
 const client = new pg.Client(process.env.POSTGRES);
-// tells server to use the cors library the () = everyone //Cors limits who can access your server
+// tells server to use the cors library the () = everyone //Cors limits who can access your server--- cors is the key that unlocks the server so that we can ask for data
 app.use(cors());
 
-// declare routes
+// Routes
 app.get("/", handleHomePage);
 app.get("/location", handleLocation);
 app.get("/weather", handleWeather);
 app.get("/trails", handleTrails);
+
+app.get("/add", (request, response) => {
+  // get data from front end
+  console.log(request.query); // query is a property withing the request object which is given from the callback function for this route.
+  const latitudeQuery = request.query.latitude;
+  const longitudeQuery = request.query.longitude;
+  const formattedQuery = request.query.formatted_query;
+  const searchQuery = request.query.search_query;
+  const safeQuery = [
+    latitudeQuery,
+    longitudeQuery,
+    formattedQuery,
+    searchQuery,
+  ];
+
+  // Sql query
+  const SQL =
+    "INSERT INTO locations (latitude, longitude, formatted_query, search_query) VALUES ($1, $2, $3, $4);"; // first arguement, second arg, etc.
+
+  // give SQL query to pg agent --- go to db and make request
+  client
+    .query(SQL, safeQuery)
+    .then((results) => {
+      response.status(200).json(results);
+    })
+    .catch((error) => {
+      response.status(500).send(error);
+    });
+});
 
 // Start the server
 client
