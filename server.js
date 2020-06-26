@@ -53,7 +53,7 @@ function fetchLocationDataFromAPI(city, response) {
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
-    q: city,
+    q: city, //TODO: what is going on here? Why do I not need to use request.query.city?
     format: "json",
   };
 
@@ -110,12 +110,8 @@ function Weather(obj) {
   this.time = new Date(obj.datetime).toDateString();
 }
 
-// Volatile Data -- because it changes frequently, we don't cache it.
+// Volatile Data -- because it changes frequently, we don't cache it. TODO: Does trail data change a lot?
 function handleTrails(request, response) {
-  const coordinates = {
-    lat: request.query.latitude,
-    lon: request.query.longitude,
-  };
   const API = `https://www.hikingproject.com/data/get-trails?&maxDistance=10`; //TODO: the distance is not working
 
   const queryObject = {
