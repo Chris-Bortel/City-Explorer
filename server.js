@@ -5,6 +5,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const pg = require("pg");
 const superagent = require("superagent");
 
 // this references the .env file and spits out the port
@@ -12,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 // Initializes an express server
 const app = express();
-
+const client = new pg.Client(process.env.POSTGRES);
 // tells server to use the cors library the () = everyone //Cors limits who can access your server
 app.use(cors());
 
@@ -23,7 +24,15 @@ app.get("/weather", handleWeather);
 app.get("/trails", handleTrails);
 
 // Start the server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+client
+  .connect()
+  .then(() => {
+    // a promise that the server will not start without first connecting to the database
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    throw `PG startup error: ${err.message}`;
+  });
 
 // Route Handlers
 
@@ -134,6 +143,7 @@ function handleTrails(request, response) {
     });
 }
 
+// TODO: Need to put the constructor function into a model file and require appropriately.
 function Trails(obj) {
   this.name = obj.name;
   this.location = obj.location;
@@ -143,7 +153,7 @@ function Trails(obj) {
   this.summary = obj.summary;
   this.trail_url = obj.url;
   this.conditions = obj.conditionDetails;
-  this.condition_date = obj.conditionDate; // I need to take this item, filter it, and then return either side to its respected variable
+  this.condition_date = obj.conditionDate; // TODO: I need to take this item, filter it, and then return either side to its respected variable
   this.condition_time = obj.conditionDate;
 }
 
