@@ -31,6 +31,8 @@ Node, Npm, and Express
 
 06-20-2020 2:00PM - Application is setup with the location API and allowing user to search by the name of the city.
 
+06-24
+
 ## Credits and Collaborations
 
 John Cokos: Followed his code demo to build the basic express server.
@@ -57,8 +59,20 @@ Give credit (and a link) to other people or resources that helped you build this
 - Finish time: 3:00 PM
 - Actual time needed to complete: 3 hours
 
-- Number and name of feature: lab-01 Feature #1 and #2 - Weather
+- Number and name of feature: lab-07 Feature #1 and #2 - Weather
 - Estimate of time needed to complete: 2 hours
 - Start time: 12:30 PM
 - Finish time: 2:00 PM
 - Actual time needed to complete: 1.5 hours
+
+- Lab 07 | Feature #4 | Trails
+- Estimate
+- Start time:
+- Finish time
+- Actual time
+
+- Lab 08 | Feature #1 | Database
+- Estimate: 1hr
+- Start time: 7:00 PM
+- End time: 7:45 PM
+- 45 minutes
