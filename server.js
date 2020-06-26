@@ -5,6 +5,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const pg = require("pg");
 const superagent = require("superagent");
 
 // this references the .env file and spits out the port
@@ -134,6 +135,7 @@ function handleTrails(request, response) {
     });
 }
 
+// TODO: Need to put the constructor function into a model file and require appropriately.
 function Trails(obj) {
   this.name = obj.name;
   this.location = obj.location;
@@ -143,7 +145,7 @@ function Trails(obj) {
   this.summary = obj.summary;
   this.trail_url = obj.url;
   this.conditions = obj.conditionDetails;
-  this.condition_date = obj.conditionDate; // I need to take this item, filter it, and then return either side to its respected variable
+  this.condition_date = obj.conditionDate; // TODO: I need to take this item, filter it, and then return either side to its respected variable
   this.condition_time = obj.conditionDate;
 }
 
