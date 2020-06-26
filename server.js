@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 // Initializes an express server
 const app = express();
-
+const client = new pg.Client(process.env.POSTGRES);
 // tells server to use the cors library the () = everyone //Cors limits who can access your server
 app.use(cors());
 
@@ -24,7 +24,15 @@ app.get("/weather", handleWeather);
 app.get("/trails", handleTrails);
 
 // Start the server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+client
+  .connect()
+  .then(() => {
+    // a promise that the server will not start without first connecting to the database
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    throw `PG startup error: ${err.message}`;
+  });
 
 // Route Handlers
 
