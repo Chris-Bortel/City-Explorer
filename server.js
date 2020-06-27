@@ -10,10 +10,10 @@ const superagent = require("superagent");
 
 // this references the .env file and spits out the port
 const PORT = process.env.PORT || 3000;
-
 // Initializes an express server
 const app = express();
-const client = new pg.Client(process.env.POSTGRES);
+const client = new pg.Client(process.env.DATABASE_URL);
+// const client = new pg.Client(process.env.POSTGRES);
 // tells server to use the cors library the () = everyone //Cors limits who can access your server--- cors is the key that unlocks the server so that we can ask for data
 app.use(cors());
 
@@ -25,8 +25,9 @@ app.get("/trails", handleTrails);
 
 app.get("/add", (request, response) => {
   // get data from front end
-  console.log(request.query); // query is a property withing the request object which is given from the callback function for this route.
+  console.log(request.query.potatoes); // query is a property withing the request object which is given from the callback function for this route.
   const latitudeQuery = request.query.latitude;
+
   const longitudeQuery = request.query.longitude;
   const formattedQuery = request.query.formatted_query;
   const searchQuery = request.query.search_query;
@@ -36,7 +37,9 @@ app.get("/add", (request, response) => {
     formattedQuery,
     searchQuery,
   ];
-
+  // This
+  // http://localhost:3000/add?latitude=47.8279&longitude=-122.3054&formatted_query=seattle&search_query=seattle
+  // need to ma
   // Sql query
   const SQL =
     "INSERT INTO locations (latitude, longitude, formatted_query, search_query) VALUES ($1, $2, $3, $4);"; // first arguement, second arg, etc.
@@ -45,6 +48,8 @@ app.get("/add", (request, response) => {
   client
     .query(SQL, safeQuery)
     .then((results) => {
+      console.log(results);
+      // look in results for rowCount // that should give me a one,. which tells us that my insert statement worked
       response.status(200).json(results);
     })
     .catch((error) => {
