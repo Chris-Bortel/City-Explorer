@@ -38,6 +38,11 @@ Lab-08 | Feature #1 | DataBase
 
 - Database is set up with schema files and working sql queries.
 
+06-29-2020
+Lab-08 | Feature #2 | Server
+
+- Server checks communicates to database to check for queried location, if the data is there, it is sent to the client. Otherwise, the server will make a call to the API and then send the response to the client for proper rendering.
+
 ## Credits and Collaborations
 
 John Cokos: Followed his code demo to build the basic express server.
@@ -79,5 +84,11 @@ Give credit (and a link) to other people or resources that helped you build this
 - Lab 08 | Feature #1 | Database
 - Estimate: 1hr
 - Start time: 7:00 PM
-- End time: 7:45 PM
-- 45 minutes
+- Finish time: 7:45 PM
+- Actual time45 minutes
+
+- Lab 08 | Feature #2 | Server
+- Estimate: 4hr
+- Start time: N/A
+- End time: N/A
+- Actual time: 8hr +
