@@ -9,7 +9,9 @@ const superagent = require("superagent");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
-const client = new pg.Client(process.env.DATABASE_URL);
+const client = new pg.Client(
+  process.env.HEROKU_POSTGRESQL_BRONZE_URL || process.env.DATABASE_URL
+);
 app.use(cors());
 
 // Routes
