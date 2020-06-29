@@ -1,4 +1,3 @@
-/* eslint-disable quotes */
 "use strict";
 
 // dotenv, express, cors
@@ -8,86 +7,102 @@ const cors = require("cors");
 const pg = require("pg");
 const superagent = require("superagent");
 
-// this references the .env file and spits out the port
 const PORT = process.env.PORT || 3000;
-
-// Initializes an express server
 const app = express();
-const client = new pg.Client(process.env.POSTGRES);
-// tells server to use the cors library the () = everyone //Cors limits who can access your server
+const client = new pg.Client(process.env.DATABASE_URL);
 app.use(cors());
 
-// declare routes
+// Routes
 app.get("/", handleHomePage);
 app.get("/location", handleLocation);
 app.get("/weather", handleWeather);
 app.get("/trails", handleTrails);
 
 // Start the server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Promise to the server that the client is connected
 client
   .connect()
-  .then(() => {
-    // a promise that the server will not start without first connecting to the database
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
+  .then(() => console.log("Client is connected"))
   .catch((err) => {
     throw `PG startup error: ${err.message}`;
   });
 
 // Route Handlers
-
 function handleHomePage(request, response) {
   response.send(`PORT ${PORT} is running`);
 }
 
-// In Memory Cache
-let locations = {};
-
 function handleLocation(request, response) {
-  // request.query.city is what the user typed in...
-  // If the database has it ...
-  if (locations[request.query.city]) {
-    console.log("we have it already...");
-    response.status(200).send(locations[request.query.city]);
-  } else {
-    console.log("going to get it");
-    fetchLocationDataFromAPI(request.query.city, response);
-  }
+  // check if the database has it with a select statement ('$' is a placeholder)
+  const SQL = "SELECT * FROM locations WHERE search_query = $1";
+  const city = [request.query.city];
+  client
+    .query(SQL, city)
+    .then((result) => {
+      if (result.rowCount) {
+        console.log("Location is in the database");
+        response.status(200).json(result.rows[0]);
+      } else {
+        locationAPIHandler(request.query.city, response);
+      }
+    })
+    .catch((error) => {
+      response.status(500).send(error);
+    });
 }
 
-function fetchLocationDataFromAPI(city, response) {
+// location api handler
+function locationAPIHandler(city, response) {
   const API = "https://us1.locationiq.com/v1/search.php";
-  // Query String
-  // ?key=${process.env.GEOCODE_API_KEY}&q=${request.query.city}&format=json`;
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
-    q: city, //TODO: what is going on here? Why do I not need to use request.query.city?
+    q: city,
     format: "json",
   };
-
+  console.log("Getting from API");
   superagent
     .get(API)
     .query(queryObject)
     .then((data) => {
       let locationObj = new Location(data.body[0], city);
-
-      // save the city for later
-      locations[city] = locationObj;
-
+      // else we want to look it up in the api and send it to the database (insert into)d
+      cacheLocation(city, data.body);
       // send the city to the user
       response.status(200).send(locationObj);
     })
     .catch(() => {
-      response.status(500).send(console.log("this is not working "));
+      response.status(500).send(console.log("Location data is not working "));
     });
 }
 
+function cacheLocation(city, data) {
+  //this function does the sql query and writes to the db
+  const location = new Location(data[0]);
+  const queryValues = [
+    city,
+    location.formatted_query,
+    location.latitude,
+    location.longitude,
+  ];
+  const SQL = `
+    INSERT INTO locations (search_query, formatted_query, latitude, longitude)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *
+  `;
+  // give the information to the postgres client agent
+  return client.query(SQL, queryValues).then((results) => {
+    // console.log(results);
+    results.rows[0];
+  });
+}
+
 function Location(obj, city) {
+  this.search_query = city;
+  this.formatted_query = obj.display_name;
   this.latitude = obj.lat;
   this.longitude = obj.lon;
-  this.formatted_query = obj.display_name;
-  this.search_query = city;
 }
 
 // Volatile Data -- because it changes frequently, we don't cache it.

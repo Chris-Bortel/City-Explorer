@@ -33,6 +33,11 @@ Node, Npm, and Express
 
 06-24
 
+06-25-2020
+Lab-08 | Feature #1 | DataBase
+
+- Database is set up with schema files and working sql queries.
+
 ## Credits and Collaborations
 
 John Cokos: Followed his code demo to build the basic express server.
