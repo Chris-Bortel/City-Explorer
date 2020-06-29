@@ -29,38 +29,26 @@ client
     throw `PG startup error: ${err.message}`; // TODO: this is undefined?
   });
 
-app.get("/add", (request, response) => {
-  // get data from front end
-  console.log(request.query.potatoes); // query is a property withing the request object which is given from the callback function for this route.
-  // const searchQuery = request.query.search_query;
-  // const formattedQuery = request.query.formatted_query;
-  // const latitudeQuery = request.query.latitude;
-  // const longitudeQuery = request.query.longitude;
-  // const safeQuery = [
-  //   latitudeQuery,
-  //   longitudeQuery,
-  //   formattedQuery,
-  //   searchQuery,
-  // ];
-  // This
-  // http://localhost:3000/add?latitude=47.8279&longitude=-122.3054&formatted_query=seattle&search_query=seattle
-  // need to ma
-  // Sql query line 86-98
-  const SQL =
-    "INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4) RETURNING *;"; // first arguement, second arg, etc.
-
-  // give SQL query to pg agent --- go to db and make request
-  // client
-  //   .query(SQL, safeQuery)
-  //   .then((results) => {
-  //     console.log(results);
-  //     // look in results for rowCount // that should give me a one,. which tells us that my insert statement worked
-  //     response.status(200).json(results);
-  //   })
-  //   .catch((error) => {
-  //     response.status(500).send(error);
-  //   });
-});
+// app.get("/add", (request, response) => {
+//   // get data from front end
+//   console.log(request.query.potatoes); // query is a property withing the request object which is given from the callback function for this route.
+//   // const searchQuery = request.query.search_query;
+//   // const formattedQuery = request.query.formatted_query;
+//   // const latitudeQuery = request.query.latitude;
+//   // const longitudeQuery = request.query.longitude;
+//   // const safeQuery = [
+//   //   latitudeQuery,
+//   //   longitudeQuery,
+//   //   formattedQuery,
+//   //   searchQuery,
+//   // ];
+//   // This
+//   // http://localhost:3000/add?latitude=47.8279&longitude=-122.3054&formatted_query=seattle&search_query=seattle
+//   // need to ma
+//   // Sql query line 86-98
+//   const SQL =
+//     "INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4) RETURNING *;"; // first arguement, second arg, etc.
+// });
 
 // In Memory Cache
 let locations = {};
@@ -71,18 +59,12 @@ function handleHomePage(request, response) {
 }
 
 function handleLocation(request, response) {
-  // request.query.city is what the user typed in...
-  // check if the database has it with a select statement
-  //figure out how I change select statement to find just the row for tacoma
+  // check if the database has it with a select statement ('$' is a placeholder)
   const SQL = "SELECT * FROM locations WHERE search_query = $1";
-  //???????/ Am I wanting to have this be the safe query variable? ????????
   const city = [request.query.city];
-  // then inside of my .then ----- that is when I do the if statement
-  /////Use .rowcount to return rows affected by the last executed statement
   client
     .query(SQL, city)
     .then((result) => {
-      // look in results for rowCount-----SQL method // that should give me a one,. which tells us that my insert statement worked
       if (result.rowCount) {
         console.log("location is in the database");
         response.status(200).json(result.rows[0]);
@@ -116,25 +98,46 @@ function locationAPIHandler(city, response) {
     q: city, //TODO: what is going on here? Why do I not need to use request.query.city?
     format: "json",
   };
-
+  console.log("api call processing");
   superagent
     .get(API)
     .query(queryObject)
     .then((data) => {
       let locationObj = new Location(data.body[0], city);
-      // save the city for later
+      // else we want to look it up in the api and send it to the database (insert into)d
+      cacheLocation(city, data.body);
 
-      ////TODO: this is where insert statement goes.
-      // else we want to look it up in the api and send it to the database (insert into)
-
-      // locations[city] = locationObj; ///// changing this to be the cache
+      // locations[city] = locationObj;
 
       // send the city to the user
       response.status(200).send(locationObj);
     })
     .catch(() => {
-      response.status(500).send(console.log("The location is not working "));
+      response
+        .status(500)
+        .send(console.log("The location data is not working "));
     });
+}
+
+function cacheLocation(city, data) {
+  //this function does the sql query and writes to the db
+  const location = new Location(data[0]);
+  const queryValues = [
+    city,
+    location.formatted_query,
+    location.latitude,
+    location.longitude,
+  ];
+  const SQL = `
+    INSERT INTO locations (search_query, formatted_query, latitude, longitude)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *
+  `;
+  // give the information to the postgres client agent
+  return client.query(SQL, queryValues).then((results) => {
+    console.log(results);
+    results.rows[0];
+  });
 }
 
 function Location(obj, city) {
