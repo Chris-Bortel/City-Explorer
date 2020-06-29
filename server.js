@@ -1,4 +1,3 @@
-/* eslint-disable quotes */
 "use strict";
 
 // dotenv, express, cors
@@ -24,34 +23,10 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // Promise to the server that the client is connected
 client
   .connect()
-  .then(() => console.log("client is connected"))
+  .then(() => console.log("Client is connected"))
   .catch((err) => {
-    throw `PG startup error: ${err.message}`; // TODO: this is undefined?
+    throw `PG startup error: ${err.message}`;
   });
-
-// app.get("/add", (request, response) => {
-//   // get data from front end
-//   console.log(request.query.potatoes); // query is a property withing the request object which is given from the callback function for this route.
-//   // const searchQuery = request.query.search_query;
-//   // const formattedQuery = request.query.formatted_query;
-//   // const latitudeQuery = request.query.latitude;
-//   // const longitudeQuery = request.query.longitude;
-//   // const safeQuery = [
-//   //   latitudeQuery,
-//   //   longitudeQuery,
-//   //   formattedQuery,
-//   //   searchQuery,
-//   // ];
-//   // This
-//   // http://localhost:3000/add?latitude=47.8279&longitude=-122.3054&formatted_query=seattle&search_query=seattle
-//   // need to ma
-//   // Sql query line 86-98
-//   const SQL =
-//     "INSERT INTO locations (search_query, formatted_query, latitude, longitude) VALUES ($1, $2, $3, $4) RETURNING *;"; // first arguement, second arg, etc.
-// });
-
-// In Memory Cache
-let locations = {};
 
 // Route Handlers
 function handleHomePage(request, response) {
@@ -66,7 +41,7 @@ function handleLocation(request, response) {
     .query(SQL, city)
     .then((result) => {
       if (result.rowCount) {
-        console.log("location is in the database");
+        console.log("Location is in the database");
         response.status(200).json(result.rows[0]);
       } else {
         locationAPIHandler(request.query.city, response);
@@ -75,18 +50,6 @@ function handleLocation(request, response) {
     .catch((error) => {
       response.status(500).send(error);
     });
-  /////send the result to the client
-
-  ////ELSE request data from api
-  //if row is found, send it to the browser
-
-  // if (locations[request.query.city]) {
-  //   console.log("we have it already...");
-  //   response.status(200).send(locations[request.query.city]);
-  // } else {
-  //   console.log("going to get it");
-  //   locationAPIHandler(request.query.city, response);
-  // }
 }
 
 // location api handler
@@ -95,10 +58,10 @@ function locationAPIHandler(city, response) {
 
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
-    q: city, //TODO: what is going on here? Why do I not need to use request.query.city?
+    q: city,
     format: "json",
   };
-  console.log("api call processing");
+  console.log("Getting from API");
   superagent
     .get(API)
     .query(queryObject)
@@ -106,16 +69,11 @@ function locationAPIHandler(city, response) {
       let locationObj = new Location(data.body[0], city);
       // else we want to look it up in the api and send it to the database (insert into)d
       cacheLocation(city, data.body);
-
-      // locations[city] = locationObj;
-
       // send the city to the user
       response.status(200).send(locationObj);
     })
     .catch(() => {
-      response
-        .status(500)
-        .send(console.log("The location data is not working "));
+      response.status(500).send(console.log("Location data is not working "));
     });
 }
 
@@ -135,7 +93,7 @@ function cacheLocation(city, data) {
   `;
   // give the information to the postgres client agent
   return client.query(SQL, queryValues).then((results) => {
-    console.log(results);
+    // console.log(results);
     results.rows[0];
   });
 }
