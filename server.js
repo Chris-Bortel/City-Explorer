@@ -177,20 +177,16 @@ function Trails(obj) {
 
 // TODO: What order should I be writing this? I did API first and then the console.log to get the response
 function handleMovies(request, response) {
-  // const API = `https://api.themoviedb.org/3/movie/550?api_key=c655ffed3ee88b057ecd2bd82aa3385b`;
   const API = `https://api.themoviedb.org/3/search/movie?`;
-  console.log("HANDLE MOVIE RESPONSE", response);
   const queryObject = {
     api_key: process.env.MOVIE_API_KEY,
     query: request.query.search_query,
   };
-  console.log("HERE IS MY QUERY OBJ +===========================", queryObject);
 
   superagent
     .get(API)
     .query(queryObject)
     .then((dataResults) => {
-      console.log(dataResults);
       let results = dataResults.body.results.map((result) => {
         // console.log(results);
         return new MOVIES(result);
@@ -199,7 +195,7 @@ function handleMovies(request, response) {
     })
     .catch((err) => {
       response.status(500).send("Movie route is not working");
-      console.error("Movie api is not working", err);
+      // console.error("Movie api is not working", err);
     });
 }
 
