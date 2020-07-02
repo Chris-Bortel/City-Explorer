@@ -19,6 +19,7 @@ app.get("/", handleHomePage);
 app.get("/location", handleLocation);
 app.get("/weather", handleWeather);
 app.get("/trails", handleTrails);
+app.get("/movies", handleMovies);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
@@ -174,6 +175,41 @@ function Trails(obj) {
   this.condition_time = obj.conditionDate;
 }
 
+// TODO: What order should I be writing this? I did API first and then the console.log to get the response
+function handleMovies(request, response) {
+  const API = `https://api.themoviedb.org/3/search/movie`;
+  // console.log("HANDLE MOVIE RESPONSE", response);
+  const queryObject = {
+    key: process.env.MOVIE_API_KEY,
+    query: request.query.search_query,
+  };
+  // console.log("HERE IS MY QUERY OBJ +===========================", queryObject);
+
+  superagent
+    .get(API)
+    .query(queryObject)
+    .then((dataResults) => {
+      let results = dataResults.body.movies.map((result) => {
+        // console.log(results);
+        return new MOVIES(result);
+      });
+      response.status(200).json(results);
+    })
+    .catch((err) => {
+      response.status(500).send("Movie route is not working");
+      console.error("Movie api is not working", err);
+    });
+}
+
+function MOVIES(obj) {
+  this.title = obj.original_title;
+  this.overview = obj.overview;
+  this.average_votes = obj.vote_average;
+  this.total_votes = obj.vote_count;
+  this.image_url = obj.post_path;
+  this.popularity = obj.popularity;
+  this.released_on = obj.release_date;
+}
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
   // custom message that tells users that eh route does not exist
