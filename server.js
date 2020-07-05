@@ -212,20 +212,37 @@ function MOVIES(obj) {
 }
 
 function handleYelp(request, response) {
+  console.log(request);
   const API = `https://api.yelp.com/v3/businesses/search`;
-  const queryObject = {
-    term: `restaraunt`,
-    lat: request.query.latitude,
-    lon: request.query.longitude,
-  };
   console.log("this is response================", response);
+  const queryObject = {
+    term: "restaurants",
+    latitude: request.query.latitude,
+    longitude: request.query.longitude,
+  };
   superagent
     .get(API)
-    .set("Authorization", `Bearer ${(process.env, YELP_API_KEY)}`)
+    .set("Authorization", `Bearer ${process.env.YELP_API_KEY}`)
     .query(queryObject)
     .then((dataResults) => {
-      // let results = dataResults.body.
+      let results = dataResults.body.businesses.map((result) => {
+        console.log(result);
+        return new Restaurants(result);
+      });
+      response.status(200).json(results);
+      console.log(results);
+    })
+    .catch((err) => {
+      response.status(500).send("Yelp route is not working");
     });
+}
+
+function Restaurants(obj) {
+  this.name = obj.name;
+  this.image_url = obj.image_url;
+  this.price = obj.price;
+  this.rating = obj.rating;
+  this.url = obj.url;
 }
 // .set('Authorization', 'Bearer ********************')
 
