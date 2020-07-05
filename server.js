@@ -1,12 +1,10 @@
 "use strict";
 
-// dotenv, express, cors
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const pg = require("pg");
 const superagent = require("superagent");
-const { request } = require("express");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -25,7 +23,7 @@ app.get("/yelp", handleYelp);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-// Promise to the server that the client is connected
+
 client
   .connect()
   .then(() => console.log("Client is connected"))
@@ -38,8 +36,8 @@ function handleHomePage(request, response) {
   response.send(`PORT ${PORT} is running`);
 }
 
+//////////// Location
 function handleLocation(request, response) {
-  // check if the database has it with a select statement ('$' is a placeholder)
   const SQL = "SELECT * FROM locations WHERE search_query = $1";
   const city = [request.query.city];
   client
@@ -57,24 +55,21 @@ function handleLocation(request, response) {
     });
 }
 
-// location api handler
 function locationAPIHandler(city, response) {
   const API = "https://us1.locationiq.com/v1/search.php";
-
   let queryObject = {
     key: process.env.GEOCODE_API_KEY,
     q: city,
     format: "json",
   };
   console.log("Getting from API");
+
   superagent
     .get(API)
     .query(queryObject)
     .then((data) => {
       let locationObj = new Location(data.body[0], city);
-      // else we want to look it up in the api and send it to the database (insert into)d
       cacheLocation(city, data.body);
-      // send the city to the user
       response.status(200).send(locationObj);
     })
     .catch(() => {
@@ -83,7 +78,6 @@ function locationAPIHandler(city, response) {
 }
 
 function cacheLocation(city, data) {
-  //this function does the sql query and writes to the db
   const location = new Location(data[0]);
   const queryValues = [
     city,
@@ -96,9 +90,7 @@ function cacheLocation(city, data) {
     VALUES ($1, $2, $3, $4)
     RETURNING *
   `;
-  // give the information to the postgres client agent
   return client.query(SQL, queryValues).then((results) => {
-    // console.log(results);
     results.rows[0];
   });
 }
@@ -110,24 +102,23 @@ function Location(obj, city) {
   this.longitude = obj.lon;
 }
 
-// Volatile Data -- because it changes frequently, we don't cache it.
+//////////// Weather
 function handleWeather(request, response) {
   const API = `https://api.weatherbit.io/v2.0/forecast/daily`;
   const queryObject = {
     key: process.env.WEATHER_API_KEY,
     lat: request.query.latitude,
     lon: request.query.longitude,
-    // &days=8   ?????How do I do this one?
   };
 
-  superagent //returned promise
+  superagent
     .get(API)
     .query(queryObject)
     .then((dataResults) => {
       let results = dataResults.body.data.map((result) => {
         return new Weather(result);
       });
-      response.status(200).json(results); //this is the actual promise
+      response.status(200).json(results);
     })
     .catch((err) => {
       console.error("Weather api is not working", err);
@@ -139,10 +130,9 @@ function Weather(obj) {
   this.time = new Date(obj.datetime).toDateString();
 }
 
-// Volatile Data -- because it changes frequently, we don't cache it. TODO: Does trail data change a lot?
+//////////// Trails
 function handleTrails(request, response) {
-  const API = `https://www.hikingproject.com/data/get-trails?&maxDistance=10`; //TODO: the distance is not working
-
+  const API = `https://www.hikingproject.com/data/get-trails?&maxDistance=10`;
   const queryObject = {
     key: process.env.TRAIL_API_KEY,
     lat: request.query.latitude,
@@ -163,7 +153,7 @@ function handleTrails(request, response) {
     });
 }
 
-// TODO: Need to put the constructor function into a model file and require appropriately.
+// TODO Need to put the constructor function into a model file and require appropriately.
 function Trails(obj) {
   this.name = obj.name;
   this.location = obj.location;
@@ -173,11 +163,11 @@ function Trails(obj) {
   this.summary = obj.summary;
   this.trail_url = obj.url;
   this.conditions = obj.conditionDetails;
-  this.condition_date = obj.conditionDate; // TODO: I need to take this item, filter it, and then return either side to its respected variable
+  this.condition_date = obj.conditionDate; // TODO I need to take this item, filter it, and then return either side to its respected variable
   this.condition_time = obj.conditionDate;
 }
 
-// TODO: What order should I be writing this? I did API first and then the console.log to get the response
+//////////// Movies
 function handleMovies(request, response) {
   const API = `https://api.themoviedb.org/3/search/movie?`;
   const queryObject = {
@@ -191,7 +181,7 @@ function handleMovies(request, response) {
     .then((dataResults) => {
       let results = dataResults.body.results.map((result) => {
         // console.log(results);
-        return new MOVIES(result);
+        return new Movies(result);
       });
       response.status(200).json(results);
     })
@@ -201,7 +191,7 @@ function handleMovies(request, response) {
     });
 }
 
-function MOVIES(obj) {
+function Movies(obj) {
   this.title = obj.original_title;
   this.overview = obj.overview;
   this.average_votes = obj.vote_average;
@@ -211,13 +201,17 @@ function MOVIES(obj) {
   this.released_on = obj.release_date;
 }
 
+//////////// Yelp
 function handleYelp(request, response) {
   const API = `https://api.yelp.com/v3/businesses/search`;
   const queryObject = {
     term: "restaurants",
     latitude: request.query.latitude,
     longitude: request.query.longitude,
+    limit: 5,
+    offset: (request.query.page - 1) * 5,
   };
+
   superagent
     .get(API)
     .set("Authorization", `Bearer ${process.env.YELP_API_KEY}`)
@@ -240,14 +234,11 @@ function Restaurants(obj) {
   this.rating = obj.rating;
   this.url = obj.url;
 }
-// .set('Authorization', 'Bearer ********************')
 
-//app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
-  // custom message that tells users that eh route does not exist
   response.status(404).send(" 404 error: provide a valid route");
 });
-// error handler
+
 app.use((error, request, response, next) => {
   response.status(500).send(" 500 error: your server is broken");
 });

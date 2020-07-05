@@ -45,7 +45,7 @@ Lab-08 | Feature #2 | Server
 
 7-5-2020
 
-- Server is recieving a request from the front end based on the users query, sends a request to the api, gets a response, and then sends it back the the front end to be rendered by the client.
+- Server is recieving a request from the front end based on the users query, sends a request to the api, gets a response, and then sends it back the the front end to be rendered by the client. Pagination is also functioning.
 
 ## Credits and Collaborations
 
@@ -97,7 +97,7 @@ Give credit (and a link) to other people or resources that helped you build this
 - End time: N/A
 - Actual time: 8hr +
 
-- Lab 09 | Feature #1, 2 | Server
+- Lab 09 | Feature #1, 2, 3 | Server
 - Estimate: 4hr
 - Start time: N/A
 - End time: N/A
