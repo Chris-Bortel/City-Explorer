@@ -212,9 +212,7 @@ function MOVIES(obj) {
 }
 
 function handleYelp(request, response) {
-  console.log(request);
   const API = `https://api.yelp.com/v3/businesses/search`;
-  console.log("this is response================", response);
   const queryObject = {
     term: "restaurants",
     latitude: request.query.latitude,
@@ -226,11 +224,9 @@ function handleYelp(request, response) {
     .query(queryObject)
     .then((dataResults) => {
       let results = dataResults.body.businesses.map((result) => {
-        console.log(result);
         return new Restaurants(result);
       });
       response.status(200).json(results);
-      console.log(results);
     })
     .catch((err) => {
       response.status(500).send("Yelp route is not working");
