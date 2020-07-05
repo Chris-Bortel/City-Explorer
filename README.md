@@ -43,6 +43,10 @@ Lab-08 | Feature #2 | Server
 
 - Server checks communicates to database to check for queried location, if the data is there, it is sent to the client. Otherwise, the server will make a call to the API and then send the response to the client for proper rendering.
 
+7-5-2020
+
+- Server is recieving a request from the front end based on the users query, sends a request to the api, gets a response, and then sends it back the the front end to be rendered by the client.
+
 ## Credits and Collaborations
 
 John Cokos: Followed his code demo to build the basic express server.
@@ -92,3 +96,9 @@ Give credit (and a link) to other people or resources that helped you build this
 - Start time: N/A
 - End time: N/A
 - Actual time: 8hr +
+
+- Lab 09 | Feature #1, 2 | Server
+- Estimate: 4hr
+- Start time: N/A
+- End time: N/A
+- Actual time: 6hr +
