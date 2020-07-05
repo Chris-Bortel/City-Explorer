@@ -6,6 +6,7 @@ const express = require("express");
 const cors = require("cors");
 const pg = require("pg");
 const superagent = require("superagent");
+const { request } = require("express");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -20,6 +21,7 @@ app.get("/location", handleLocation);
 app.get("/weather", handleWeather);
 app.get("/trails", handleTrails);
 app.get("/movies", handleMovies);
+app.get("/yelp", handleYelp);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
@@ -208,6 +210,24 @@ function MOVIES(obj) {
   this.popularity = obj.popularity;
   this.released_on = obj.release_date;
 }
+
+function handleYelp(request, response) {
+  const API = `https://api.yelp.com/v3/businesses/search`;
+  const queryObject = {
+    term: `restaraunt`,
+    lat: request.query.latitude,
+    lon: request.query.longitude,
+  };
+  console.log("this is response================", response);
+  superagent
+    .get(API)
+    .set("Authorization", `Bearer ${(process.env, YELP_API_KEY)}`)
+    .query(queryObject)
+    .then((dataResults) => {
+      // let results = dataResults.body.
+    });
+}
+// .set('Authorization', 'Bearer ********************')
 
 //app.put(), app.delete(), app.post()
 app.use("*", (request, response) => {
